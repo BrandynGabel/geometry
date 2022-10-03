@@ -10,9 +10,9 @@ use std::fmt::{self, Formatter, Display};
 pub struct Point
 {
 
-	dimensions: u8, // Attempt to handle up to 255 spatial dimensions
-	values: Vec<f32>,
 	name: String,
+	values: Vec<f32>,
+	dimensions: u8, // Attempt to handle up to 255 spatial dimensions
 
 }
 
@@ -23,19 +23,22 @@ pub struct Point
 impl Point
 {
 
-	// Create a Point with 'vals.len()' number of dimensions.
-	// Assign the values of 'vals' to those dimensions in order.
-	// Name the point with String 'n'.
-	pub fn new_point (vals: Vec<f32>, n: String) -> Self 
+	// Create a new Point
+	// @PARAM n: A String containing the name of the point
+	// @PARAM vals: Set of 32-bit floats designating the values of the points
+	//				vals[0] = first dimensions, vals[1] = second dimension, etc.
+	// @RETURN: The Point
+	pub fn new_point (n: String, vals: Vec<f32>) -> Self 
 	
 	{
 	
 		Point
 		{
 
-			dimensions: vals.len() as u8,
-			values: vals,
 			name: n,
+			dimensions: vals.len() as u8,
+			values: vals, // vals.len() must be used first in 
+						  // order to avoid losing ownership of vals
 
 		}
 	
@@ -62,6 +65,7 @@ impl Point
 
 
 	// Getter function for the x-value.
+	// @NOTE: Only use for 1D, 2D, or 3D Point
 	// @PARAM &self: Reference to the struct
 	// @RETURN: 32-bit float holding the x-value
 	pub fn get_x (&self) -> f32 // Learning note: &self is shorthand for self: &Self
@@ -78,6 +82,7 @@ impl Point
 
 
 	// Getter function for the y-value
+	// @NOTE: Only use for 2D or 3D Point
 	// @PARAM &self: Reference to the struct
 	// @RETURN: 32-bit float holding the y-value
 	pub fn get_y (&self) -> f32 
@@ -94,6 +99,7 @@ impl Point
 
 
 	// Getter function for the z-value
+	// @NOTE: Only use for 3D Point
 	// @PARAM &self: Reference to the struct
 	// @RETURN: 32-bit float holding the z-value
 	pub fn get_z (&self) -> f32 
@@ -109,6 +115,7 @@ impl Point
 
 
 	// Getter function for the value at dimension 'dim'
+	// @NOTE: Can be used for accessing value of any dimension
 	// @PARAM &self: Reference to the struct
 	// @PARAM dim: System default integer size holding the dimension of interest
 	// @RETURN: 32-bit float holding the value at dimension 'dim'
@@ -125,7 +132,7 @@ impl Point
 
 
 
-
+	// @TODO: Fix and finish
 	// Getter function for the values vector
 	/*pub fn get_all_vals (&self) -> Vec<f32> 
 	
@@ -158,6 +165,7 @@ impl Point
 
 
 	// Setter function for the x-value
+	// @NOTE: Only use for 1D, 2D, or 3D Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_x: 32-bit float containing the new x-value
 	// @RETURN: None
@@ -175,6 +183,7 @@ impl Point
 
 
 	// Setter function for the y-value
+	// @NOTE: Only use for 2D or 3D Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_y: 32-bit float containing the new y-value
 	// @RETURN: None
@@ -192,6 +201,7 @@ impl Point
 
 
 	// Setter function for the z-value
+	// @NOTE: Only use for 3D Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_z: 32-bit float containing the new z-value
 	// @RETURN: None
@@ -271,40 +281,20 @@ impl Point
 
 
 
-
+// @TODO: Finish fmt and write comments
 impl Display for Point
 {
 
 	fn fmt (&self, f: &mut Formatter) -> fmt::Result 
 		
-		{
-		
-			let name = self.get_name();
-			let dims = self.get_dimensions();
+	{
+	
+		let name = self.get_name();
+		let dims = self.get_dimensions();
 
-			write! (f, "{0} has {1} spatial dimensions\n{0} = ", name, dims,)
+		write! (f, "{0} has {1} spatial dimensions\n{0} = ", name, dims,)
 
-		
-		}		
+	
+	}		
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
