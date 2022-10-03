@@ -261,17 +261,17 @@ impl Point
 	{
 	
 		println!("{} has {} spatial dimensions", self.get_name(), self.get_dimensions());
-	    print! ("{} = (", self.get_name());
-	    let dimensions = self.get_dimensions().into();
+	    	print! ("{} = (", self.get_name());
+	    	let dimensions = self.get_dimensions().into();
 
-	    for dimension in 1 .. dimensions
-	    {
+	    	for dimension in 1 .. dimensions
+	    	{
 
-	        print! ("{}, ", self.get_val_at(dimension));  
+	        	print! ("{}, ", self.get_val_at(dimension));  
 
-	    }
+	    	}
 
-	    println! ("{})", self.get_val_at(dimensions));
+	    	println! ("{})", self.get_val_at(dimensions));
 	
 	}
 
