@@ -64,20 +64,3 @@ impl Display for Line
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
