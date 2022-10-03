@@ -20,13 +20,14 @@ pub struct Point
 
 
 
+
 impl Point
 {
 
 	// Create a new Point
 	// @PARAM n: A String containing the name of the point
 	// @PARAM vals: Set of 32-bit floats designating the values of the points
-	//				vals[0] = first dimensions, vals[1] = second dimension, etc.
+	//		vals[0] = first dimensions, vals[1] = second dimension, etc.
 	// @RETURN: The Point
 	pub fn new_point (n: String, vals: Vec<f32>) -> Self 
 	
@@ -49,15 +50,16 @@ impl Point
 
 
 
-	// Getter for number of dimensions
+	// Getter function for the name
 	// @PARAM &self: Reference to the struct
-	// @RETURN: unsigned 8-bit integer holding the number of dimensions
-	pub fn get_dimensions (&self) -> u8 
+	// @RETURN: String holding the name
+	pub fn get_name (&self) -> String 
 	
 	{
 	
-		self.dimensions
-	
+		let val = &self.name;
+		String::from(val)
+
 	}
 
 
@@ -132,6 +134,23 @@ impl Point
 
 
 
+
+	// Getter for number of dimensions
+	// @PARAM &self: Reference to the struct
+	// @RETURN: unsigned 8-bit integer holding the number of dimensions
+	pub fn get_dimensions (&self) -> u8 
+	
+	{
+	
+		self.dimensions
+	
+	}
+
+
+
+
+
+
 	// @TODO: Fix and finish
 	// Getter function for the values vector
 	/*pub fn get_all_vals (&self) -> Vec<f32> 
@@ -141,23 +160,6 @@ impl Point
 		self.values
 	
 	}*/
-
-
-
-
-
-
-	// Getter function for the name
-	// @PARAM &self: Reference to the struct
-	// @RETURN: String holding the name
-	pub fn get_name (&self) -> String 
-	
-	{
-	
-		let val = &self.name;
-		String::from(val)
-
-	}
 
 
 
@@ -276,6 +278,7 @@ impl Point
 	}
 
 }
+
 
 
 
