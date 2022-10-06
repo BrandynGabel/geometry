@@ -1,3 +1,3 @@
 # math
-Math API in Rust\n
-Indentations aren't displaying correctly
+Math API in Rust.
+       Indentations aren't displaying correctly
