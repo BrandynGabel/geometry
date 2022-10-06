@@ -1,3 +1,3 @@
-# math
-Math API in Rust.
-       Indentations aren't displaying correctly
+# Geometry
+## Euclidean geometry API in Rust.
+Indentations aren't displaying correctly
