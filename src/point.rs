@@ -25,6 +25,7 @@ impl Point
 {
 
 	// Create a new Point
+	// @NOTE: A Point must have at least 1 value, and a name of at least length 1. 
 	// @PARAM n: A String containing the name of the point
 	// @PARAM vals: Set of 32-bit floats designating the values of the points
 	//				vals[0] = first dimensions, vals[1] = second dimension, etc.
@@ -52,14 +53,14 @@ impl Point
 		}
 		else if n.len() == 0
 		{
-		
+			// Not sure how to clean up this line. Pressing Enter and Tab will print \n and \t
 			Err(format!("Error: A Point must have a name of at least length 1. You supplied an empty String for your Point's name."))
 		
 		}
 		else if vals.len() < 1 || vals.len() > 255
 		{
 			
-			// Not sure how to clean up this line. Pressing Enter and Tab will print \n and \t
+			
 			Err(format!("Error: A Point must have at least 1 dimension, and no more than 255 dimensions. You supplied a Vector of length {}", vals.len()))
 		
 		}
@@ -112,11 +113,13 @@ impl Point
 	// Getter function for the y-value
 	// @NOTE: Only use for 2D or 3D Point
 	// @PARAM &self: Reference to the struct
-	// @RETURN: 32-bit float holding the y-value
+	// @RETURN: Option<f32>
+	//			|_ Some() = 32-bit float holding the y-value
+	//			|_ None if it's a 1D Point
 	pub fn get_y (&self) -> Option<f32>
 	
 	{
-		if self.values.len() > 1
+		if self.dimensions > 1
 		{
 		
 			Some(self.values[1])
@@ -139,12 +142,25 @@ impl Point
 	// Getter function for the z-value
 	// @NOTE: Only use for 3D Point
 	// @PARAM &self: Reference to the struct
-	// @RETURN: 32-bit float holding the z-value
-	pub fn get_z (&self) -> f32 
+	// @RETURN: Option<f32>
+	//			|_ Some() = 32-bit float holding the z-value
+	//			|_ None if it's a 1D or 2D Point
+	pub fn get_z (&self) -> Option<f32> 
 	
 	{
 	
-		self.values[2]
+		if self.dimensions > 2
+		{
+		
+			Some(self.values[2])
+		
+		}
+		else
+		{
+		
+			None
+		
+		}
 	
 	}
 
@@ -163,7 +179,7 @@ impl Point
 	
 	{
 		
-		if dim < self.values.len()
+		if dim <= self.dimensions.into()
 		{
 		
 			Ok(self.values[dim - 1])
@@ -172,9 +188,8 @@ impl Point
 		else
 		{
 		
-			Err(format!("Error: You requested the value of dimension {},
-						but the Point named {} only has {} dimensions.",
-						dim, self.name, self.values.len()))
+			Err(format!("Error: You requested the value of dimension {}, but the Point named {} only has {} dimensions.",
+						dim, self.name, self.dimensions))
 		
 		}
 	
@@ -239,12 +254,26 @@ impl Point
 	// @NOTE: Only use for 2D or 3D Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_y: 32-bit float containing the new y-value
-	// @RETURN: None
-	pub fn set_y (&mut self, new_y: f32)
+	// @RETURN: Result<(), String>
+	//			|_ Ok()  = () unit value
+	//			|_ Err() = String containing an error message
+	pub fn set_y (&mut self, new_y: f32) -> Result<(), String>
 	
 	{
 	
-		self.values[1] = new_y;
+		if self.dimensions > 1
+		{
+		
+			self.values[1] = new_y;
+			Ok(())
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: You cannot change the y-value of the Point named {} because it does not exist.", self.name))
+		
+		}
 	
 	}
 
@@ -257,12 +286,26 @@ impl Point
 	// @NOTE: Only use for 3D Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_z: 32-bit float containing the new z-value
-	// @RETURN: None
-	pub fn set_z (&mut self, new_z: f32)
+	// @RETURN: Result<(), String>
+	//			|_ Ok()  = () unit value
+	//			|_ Err() = String containing an error message
+	pub fn set_z (&mut self, new_z: f32) -> Result<(), String>
 	
 	{
 	
-		self.values[2] = new_z;
+		if self.dimensions > 2
+		{
+		
+			self.values[2] = new_z;
+			Ok(())
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: You cannot change the z-value of the Point named {} because it does not exist.", self.name))
+		
+		}
 	
 	}
 
@@ -274,12 +317,27 @@ impl Point
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM dim: System default integer size holding the dimension of interest
 	// @PARAM new_val: 32-bit float containing the new value for dimension 'dim'
-	// @RETURN: None
-	pub fn set_val_at (&mut self, dim: usize, new_val: f32)
+	// @RETURN: Result<(), String>
+	//			|_ Ok()  = () unit value
+	//			|_ Err() = String containing an error message
+	pub fn set_val_at (&mut self, dim: usize, new_val: f32) -> Result<(), String>
 	
 	{
 		
-		self.values[dim - 1] = new_val;
+		if self.dimensions >= dim as u8
+		{
+		
+			self.values[dim - 1] = new_val;
+			Ok(())
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: You cannot change dimension {} of the Point named {} because it does not exist.", dim, self.name))
+		
+		}
+		
 	
 	}
 
@@ -291,12 +349,26 @@ impl Point
 	// Setter function for the name
 	// @PARAM &mut self: Mutatable reference to the struct
 	// @PARAM new_name: String holding the new name
-	// @RETURN: None
-	pub fn set_name (&mut self, new_name: String) 
+	// @RETURN: Result<(), String>
+	//			|_ Ok()  = () unit value
+	//			|_ Err() = String containing an error message
+	pub fn set_name (&mut self, new_name: String) -> Result<(), String>
 	
 	{
-	
-		self.name = new_name;
+		
+		if new_name.len() > 0
+		{
+		
+			self.name = new_name;
+			Ok(())
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: You cannot change the name of a Point to an empty String."))
+		
+		}
 	
 	}
 
@@ -311,8 +383,19 @@ impl Point
 	pub fn print_all (&self)
 	
 	{
-	
-		println!("{} has {} spatial dimensions", self.name, self.dimensions);
+		
+		if self.dimensions == 1
+		{
+		
+			println!("{} has 1 spatial dimension.", self.name);
+		
+		}
+		else
+		{
+		
+			println!("{} has {} spatial dimensions.", self.name, self.dimensions);
+		
+		}
 	    print!("{} = (", self.name);
 
 	    for index in 1 .. self.dimensions
@@ -332,7 +415,30 @@ impl Point
 	    println!("{})", self.values.last().unwrap()); // This will crash the program if self.values is empty.
 	    											  // Creating a Point with an empty Vector should return
 	    											  // a String via Err() explaining the Vector cannot be
-	    											  // empty and can have maximum length of 255.
+	    											  // empty and can only have a maximum length of 255.
+	
+	}
+
+
+
+
+
+
+	// Copy the Point
+	// @PARAM &self: A reference to the Point
+	// @RETURN: A copy of the Point
+	fn copy (&self) -> Point 
+	
+	{
+	
+		Point
+		{
+
+			name: self.get_name(),
+			dimensions: self.get_dimensions(),
+			values: self.get_all_vals(),
+
+		}
 	
 	}
 
@@ -345,18 +451,32 @@ impl Point
 // @TODO: Finish fmt and write comments
 impl Display for Point
 {
-
+	// This function allows you to print the Point inside a macro with {}
+	// @PARAM &self: A reference to the struct
+	// @PARAM &mut Formatter: Mutatable reference to a Formatter
+	// @Return: fmt::Result ... basically prints the point
 	fn fmt (&self, f: &mut Formatter) -> fmt::Result 
 		
 	{
 	
 		let name  = self.get_name();
 		let dims  = self.get_dimensions();
+		// This statement collects all the values for each dimension into a string and separates them with a comma and space.
 		let mut point = self.values.iter().map(|val| format!("{}", val)).collect::<Vec<String>>().join(", ");
 		point.pop(); point.pop();
 
-		write!(f, "{0} has {1} spatial dimensions\n{0} = ({2})", name, dims, point)
-
+		if self.dimensions == 1
+		{
+		
+			write!(f, "{0} has 1 spatial dimension.\n{0} = ({1})", name, point)
+		
+		}
+		else
+		{
+		
+			write!(f, "{0} has {1} spatial dimensions.\n{0} = ({2})", name, dims, point)
+		
+		}
 	
 	}		
 
