@@ -6,7 +6,7 @@
 // Each dimension will have f32 precision.
 use std::fmt::{self, Formatter, Display};
 
-#[derive (Debug)]
+#[derive (Debug, Clone)]
 pub struct Point
 {
 
@@ -16,7 +16,7 @@ pub struct Point
 
 }
 
-
+  
 
 
 
@@ -27,20 +27,47 @@ impl Point
 	// Create a new Point
 	// @PARAM n: A String containing the name of the point
 	// @PARAM vals: Set of 32-bit floats designating the values of the points
-	//		vals[0] = first dimensions, vals[1] = second dimension, etc.
-	// @RETURN: The Point
-	pub fn new_point (n: String, vals: Vec<f32>) -> Self 
+	//				vals[0] = first dimensions, vals[1] = second dimension, etc.
+	// @RETURN: Result<Self, String>
+	//			|_ Ok()  = The Point
+	//			|_ Err() = String containing an error message
+	pub fn new_point (n: String, vals: Vec<f32>) -> Result<Self, String> 
 	
 	{
-	
-		Point
+		if vals.len() > 0 && vals.len() < 256 && n.len() > 0
 		{
 
-			name: n,
-			dimensions: vals.len() as u8,
-			values: vals, // vals.len() must be used first in 
-						  // order to avoid losing ownership of vals
+			Ok(
+				Point
+				{
 
+					name: n,
+					dimensions: vals.len() as u8,
+					values: vals, // vals.len() must be used first in 
+								  // order to avoid losing ownership of vals
+
+				}
+			)
+
+		}
+		else if n.len() == 0
+		{
+		
+			Err(format!("Error: A Point must have a name of at least length 1. You supplied an empty String for your Point's name."))
+		
+		}
+		else if vals.len() < 1 || vals.len() > 255
+		{
+			
+			// Not sure how to clean up this line. Pressing Enter and Tab will print \n and \t
+			Err(format!("Error: A Point must have at least 1 dimension, and no more than 255 dimensions. You supplied a Vector of length {}", vals.len()))
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: An unknown error occurred."))
+		
 		}
 	
 	}
@@ -52,13 +79,12 @@ impl Point
 
 	// Getter function for the name
 	// @PARAM &self: Reference to the struct
-	// @RETURN: String holding the name
+	// @RETURN: Clone of String holding the name
 	pub fn get_name (&self) -> String 
 	
 	{
 	
-		let val = &self.name;
-		String::from(val)
+		self.name.clone()
 
 	}
 
@@ -87,11 +113,21 @@ impl Point
 	// @NOTE: Only use for 2D or 3D Point
 	// @PARAM &self: Reference to the struct
 	// @RETURN: 32-bit float holding the y-value
-	pub fn get_y (&self) -> f32 
+	pub fn get_y (&self) -> Option<f32>
 	
 	{
-	
-		self.values[1]
+		if self.values.len() > 1
+		{
+		
+			Some(self.values[1])
+		
+		}
+		else
+		{
+		
+			None
+		
+		}
 	
 	}
 
@@ -117,16 +153,30 @@ impl Point
 
 
 	// Getter function for the value at dimension 'dim'
-	// @NOTE: Can be used for accessing value of any dimension
+	// @NOTE: Can be used for accessing value of any dimension that exists
 	// @PARAM &self: Reference to the struct
 	// @PARAM dim: System default integer size holding the dimension of interest
-	// @RETURN: 32-bit float holding the value at dimension 'dim'
-	pub fn get_val_at (&self, dim: usize) -> f32 
+	// @RETURN: Result<f32, String>
+	//			|_ Ok()  = 32-bit float holding the value at dimension 'dim'
+	//			|_ Err() = String containing an error message
+	pub fn get_val_at (&self, dim: usize) -> Result<f32, String> 
 	
 	{
 		
-		//assert! (dim < self.values.len());
-		self.values[dim - 1]
+		if dim < self.values.len()
+		{
+		
+			Ok(self.values[dim - 1])
+		
+		}
+		else
+		{
+		
+			Err(format!("Error: You requested the value of dimension {},
+						but the Point named {} only has {} dimensions.",
+						dim, self.name, self.values.len()))
+		
+		}
 	
 	}
 
@@ -151,15 +201,16 @@ impl Point
 
 
 
-	// @TODO: Fix and finish
 	// Getter function for the values vector
-	/*pub fn get_all_vals (&self) -> Vec<f32> 
+	// @PARAM &self: Reference to the struct
+	// @RETURN: Clone of values
+	pub fn get_all_vals (&self) -> Vec<f32> 
 	
 	{
 	
-		self.values
+		self.values.clone()
 	
-	}*/
+	}
 
 
 
@@ -228,7 +279,6 @@ impl Point
 	
 	{
 		
-		//assert! (dim < self.values.len());
 		self.values[dim - 1] = new_val;
 	
 	}
@@ -240,13 +290,13 @@ impl Point
 
 	// Setter function for the name
 	// @PARAM &mut self: Mutatable reference to the struct
-	// @PARAM n: String holding the new name
+	// @PARAM new_name: String holding the new name
 	// @RETURN: None
-	pub fn set_name (&mut self, n: String) 
+	pub fn set_name (&mut self, new_name: String) 
 	
 	{
 	
-		self.name = n;
+		self.name = new_name;
 	
 	}
 
@@ -262,23 +312,31 @@ impl Point
 	
 	{
 	
-		println!("{} has {} spatial dimensions", self.get_name(), self.get_dimensions());
-	    	print! ("{} = (", self.get_name());
-	    	let dimensions = self.get_dimensions().into();
+		println!("{} has {} spatial dimensions", self.name, self.dimensions);
+	    print!("{} = (", self.name);
 
-	    	for dimension in 1 .. dimensions
-	    	{
+	    for index in 1 .. self.dimensions
+	    {
 
-	        	print! ("{}, ", self.get_val_at(dimension));  
+	        match self.get_val_at(index.into())
+	        {
+	          
+	        	Ok(val)  => print!("{}, ", val),
+	          	
+	          	Err(err) => print!("{}", err),
+	          
+	        };
 
-	    	}
+	    }
 
-	    	println! ("{})", self.get_val_at(dimensions));
+	    println!("{})", self.values.last().unwrap()); // This will crash the program if self.values is empty.
+	    											  // Creating a Point with an empty Vector should return
+	    											  // a String via Err() explaining the Vector cannot be
+	    											  // empty and can have maximum length of 255.
 	
 	}
 
 }
-
 
 
 
@@ -292,10 +350,12 @@ impl Display for Point
 		
 	{
 	
-		let name = self.get_name();
-		let dims = self.get_dimensions();
+		let name  = self.get_name();
+		let dims  = self.get_dimensions();
+		let mut point = self.values.iter().map(|val| format!("{}", val)).collect::<Vec<String>>().join(", ");
+		point.pop(); point.pop();
 
-		write! (f, "{0} has {1} spatial dimensions\n{0} = ", name, dims,)
+		write!(f, "{0} has {1} spatial dimensions\n{0} = ({2})", name, dims, point)
 
 	
 	}		
