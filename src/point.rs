@@ -12,7 +12,10 @@ pub struct Point
 
 	name: String,
 	values: Vec<f32>,
-	dimensions: u8, // Attempt to handle up to 255 spatial dimensions
+	dimensions: usize, // dimensions is defined as usize, which is about 184 quintillion,
+					   // but the instantiation of a Point is limited to u8 which is 255.
+					   // It is defined as usize because that is what the Rust std lib uses
+					   // as the parameter type for uints, and I want to avoid using .into()
 
 }
 
@@ -43,7 +46,7 @@ impl Point
 				{
 
 					name: n,
-					dimensions: vals.len() as u8,
+					dimensions: vals.len(),
 					values: vals, // vals.len() must be used first in 
 								  // order to avoid losing ownership of vals
 
@@ -54,14 +57,14 @@ impl Point
 		else if n.len() == 0
 		{
 			// Not sure how to clean up this line. Pressing Enter and Tab will print \n and \t
-			Err(format!("Error: A Point must have a name of at least length 1. You supplied an empty String for your Point's name."))
+			Err(format!("Error: A Point must have a name of length 1 or greater. You supplied an empty String for your Point's name."))
 		
 		}
 		else if vals.len() < 1 || vals.len() > 255
 		{
 			
 			
-			Err(format!("Error: A Point must have at least 1 dimension, and no more than 255 dimensions. You supplied a Vector of length {}", vals.len()))
+			Err(format!("Error: A Point must have at least 1 dimension, and no more than {} dimensions. You supplied a Vector of length {}", u8::MAX, vals.len()))
 		
 		}
 		else
@@ -203,7 +206,7 @@ impl Point
 	// Getter for number of dimensions
 	// @PARAM &self: Reference to the struct
 	// @RETURN: unsigned 8-bit integer holding the number of dimensions
-	pub fn get_dimensions (&self) -> u8 
+	pub fn get_dimensions (&self) -> usize 
 	
 	{
 	
@@ -324,7 +327,7 @@ impl Point
 	
 	{
 		
-		if self.dimensions >= dim as u8
+		if self.dimensions >= dim && dim > 0
 		{
 		
 			self.values[dim - 1] = new_val;
@@ -366,7 +369,7 @@ impl Point
 		else
 		{
 		
-			Err(format!("Error: You cannot change the name of a Point to an empty String."))
+			Err(format!("Error: A Point must have a name of length 1 or greater. You tried to change the name of the Point named {} to an empty String.", self.name))
 		
 		}
 	
@@ -427,7 +430,7 @@ impl Point
 	// Copy the Point
 	// @PARAM &self: A reference to the Point
 	// @RETURN: A copy of the Point
-	fn copy (&self) -> Point 
+	pub fn clone (&self) -> Point 
 	
 	{
 	
@@ -439,6 +442,52 @@ impl Point
 			values: self.get_all_vals(),
 
 		}
+	
+	}
+
+
+
+
+
+
+	// Calculate the distance between two Points
+	// @NOTE: If the Points do not have the same number of
+	//		  dimensions, the calculation will be carried
+	//		  out in the higher spacial dimension of the two
+	// @PARAM &self: A reference to the first Point
+	// @PARAM p2 &Point: A reference to the second Point
+	// @RETURN: 32-bit floating point holding the distance between the two Points
+	pub fn distance_to (&self, p2: &Point) -> f32 
+	
+	{
+	
+		let mut vec1 = self.get_all_vals();
+		let mut vec2 = p2.get_all_vals();
+		let mut distance: f32 = 0.0;
+
+		// if-elseif block ensures Points are calculated in the higher dimension
+		if vec1.len() > vec2.len()
+		{
+		
+			vec2.resize(vec1.len(), 0.0);
+		
+		}
+		else if vec1.len() < vec2.len()
+		{
+		
+			vec1.resize(vec2.len(), 0.0);
+		
+		}
+
+		
+		for index in 0 .. vec1.len()
+		{
+		
+			distance = distance + (vec2[index] - vec1[index]).powi(2);
+		
+		}
+
+		distance.sqrt()
 	
 	}
 
@@ -459,22 +508,19 @@ impl Display for Point
 		
 	{
 	
-		let name  = self.get_name();
-		let dims  = self.get_dimensions();
 		// This statement collects all the values for each dimension into a string and separates them with a comma and space.
-		let mut point = self.values.iter().map(|val| format!("{}", val)).collect::<Vec<String>>().join(", ");
-		point.pop(); point.pop();
+		let point = self.values.iter().map(|val| format!("{}", val)).collect::<Vec<String>>().join(", ");
 
 		if self.dimensions == 1
 		{
 		
-			write!(f, "{0} has 1 spatial dimension.\n{0} = ({1})", name, point)
+			write!(f, "{} = ({})", self.name, point)
 		
 		}
 		else
 		{
 		
-			write!(f, "{0} has {1} spatial dimensions.\n{0} = ({2})", name, dims, point)
+			write!(f, "{} = ({})", self.name, point)
 		
 		}
 	
