@@ -2,11 +2,13 @@
 
 mod point;
 mod line;
+mod line_segment;
 mod shape;
 
 use std::io;
 use crate::point::Point;
 use crate::line::Line;
+use crate::line_segment::LineSegment;
 use crate::shape::Shape;
 
 
