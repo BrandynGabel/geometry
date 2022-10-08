@@ -1,6 +1,4 @@
 // This file defines a Line from a tuple of two Points. 
-// The Line will exist in the same spatial dimension as
-// the Point with a higher number of spatial dimensions.
 
 
 use crate::Point;
@@ -22,14 +20,18 @@ pub struct Line<'a>
 // @TODO: LEARN ABOUT LIFETIMES AND
 //		  POINT REFERENCES IN TUPLE
 //
+//		  FIX new_line(...)
+//
 //**********************************
-impl<'a> Line<'_>
+impl<'a> Line<'a>
 {
 	// Create a new Line
 	// @PARAM n: A String holding the name of the Line
 	// @PARAM vals: A tuple of Points. 
-	// @RETURN: The Line 
-	/*pub fn new_line (n: String, vals: (&Point, &Point)) //-> Result<Self, String> 
+	// @RETURN: Result<Self, String>
+	//			|_ Ok()  = The Line
+	//			|_ Err() = String containing an error message 
+	pub fn new_line (n: String, vals: (&'a Point, &'a Point)) -> Result<Self, String> 
 	
 	{
 		if n.len() > 0
@@ -41,7 +43,6 @@ impl<'a> Line<'_>
 				{
 
 					name: n,
-					//dimensions: // Point with higher dimensions
 					points: vals,
 
 				}
@@ -56,7 +57,7 @@ impl<'a> Line<'_>
 		
 		}
 	
-	}*/
+	}
 
 
 
@@ -66,13 +67,7 @@ impl<'a> Line<'_>
 	// Getter function for the name
 	// @PARAM &self: Reference to the struct
 	// @RETURN: Clone of String holding the name
-	pub fn get_name (&self) -> String 
-	
-	{
-		
-		self.name.clone()
-	
-	}
+	pub fn get_name (&self) -> String { self.name.clone() }
 
 
 
@@ -81,13 +76,14 @@ impl<'a> Line<'_>
 	// Getter function for the Vector of Points supplied to make the Line
 	// @PARAM &self: Reference to the Line
 	// @RETURN: Vector of Points
-	pub fn get_points (&self) -> (&Point, &Point) 
-	
-	{
-	
-		self.points.clone()
-	
-	}
+	pub fn get_points (&self) -> (&Point, &Point) { self.points.clone() }
+
+
+
+
+
+
+	// 
 
 
 
@@ -100,13 +96,7 @@ impl<'a> Line<'_>
 	// @PARAM &mut self: A mutable reference to the Line
 	// @PARAM new_name: A String containing the new name for the Line
 	// @RETURN: None
-	pub fn set_name (&mut self, new_name: String)
-	
-	{
-	
-		self.name = new_name;
-	
-	}
+	pub fn set_name (&mut self, new_name: String) { self.name = new_name; }
 
 
 
@@ -122,14 +112,15 @@ impl<'a> Line<'_>
 
 
 
-impl Display for Line<'_>
+impl<'a> Display for Line<'a>
 {
 
 	fn fmt (&self, f: &mut Formatter) -> fmt::Result
 	
 	{
 	
-		unimplemented!();
+		let points = format!("{}, {}", self.points.0, self.points.1);
+		write!(f, "{}", points)
 	
 	}
 

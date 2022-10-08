@@ -2,19 +2,20 @@
 // A Shape will consist of an arbitrary number of Points
 // The points will represent the vertices of the Shape
 // A Shape will also need to have its edges defined
-// with a Vector of Lines.
+// with a Vector of LineSegments.
 
 use crate::Point;
 use crate::Line;
+use crate::LineSegment as Edge;
 use std::fmt::{self, Formatter, Display};
-
-#[derive (Debug)]
+/*
+#[derive (Debug, Clone)]
 pub struct Shape
 {
 
 	name: String,
 	vertices: Vec<Point>,
-	edges: Vec<Line>,
+	edges: Vec<Edge>,
 
 }
 
@@ -26,7 +27,12 @@ pub struct Shape
 impl Shape
 {
 
-	pub fn new_shape (n: String, vert: Vec<Point>, edg: Vec<Line>) -> Self 
+	// Create a new Shape
+	// @PARAM n: A String holding the name of the Shape
+	// @PARAM vert: A Vector of Points. Each Point is a vertex
+	// @PARAM edg: A Vector of LineSegments. Each LineSegment is an edge
+	// @RETURN: The Shape
+	pub fn new_shape (n: String, vert: Vec<Point>, edg: Vec<Edge>) -> Self 
 	
 	{ 
 		Shape
@@ -54,8 +60,8 @@ impl Display for Shape
 	
 	{
 	
-		unimplemented! ();
+		unimplemented!();
 	
 	}
 
-}
+}*/
